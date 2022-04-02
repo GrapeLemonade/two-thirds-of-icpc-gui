@@ -1,5 +1,7 @@
 {
   "name": "two-thirds-of-icpc-gui",
+  "description": "GUI module of 2/3 ICPC",
+  "author": "Grape Lemonade",
   "version": "0.1.0",
   "private": true,
   "scripts": {
