@@ -1,5 +1,6 @@
 const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
+  publicPath: ".",
   transpileDependencies: [
     'vuetify'
   ],
@@ -8,6 +9,7 @@ module.exports = defineConfig({
       builderOptions: {
         "win": {
           "target": [
+              "nsis",
               "portable"
           ]
         }
