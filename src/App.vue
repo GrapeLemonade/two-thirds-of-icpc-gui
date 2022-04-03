@@ -48,7 +48,7 @@
                 <v-toolbar class="elevation-0 py-1" style="flex-grow: 0">
                   <v-btn dark class="primary" @click="importText"> 导入文本文件 <v-icon right light> mdi-file-import </v-icon> </v-btn>
                   <v-spacer/>
-                  <v-btn dark class="primary" @click="clearText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
+                  <v-btn dark class="primary" @click="clearInputText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
                   <v-spacer/>
                   <v-btn dark class="primary"
                          @click="solve"
@@ -68,6 +68,8 @@
             <v-card class="elevation-6" style="height: 100%; display: flex; flex-direction: column">
               <v-toolbar class="elevation-0 py-1" style="flex-grow: 0">
                 <v-btn dark class="primary" @click="exportText"> 导出文本文件 <v-icon right light> mdi-file-export </v-icon> </v-btn>
+                <v-spacer/>
+                <v-btn dark class="primary" @click="clearOutputText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
               </v-toolbar>
               <v-card-text style="flex-grow: 1" class="pt-3">
                 <v-textarea filled no-resize height="93%" placeholder="求解结果" style="height: 100%" readonly v-model="outputText"/>
@@ -102,12 +104,39 @@ export default {
     }
   },
   methods: {
-    clearText() {
+    reportError(msg) {
+      alert(msg)
+    },
+    clearInputText() {
       this.inputText = ''
+    },
+    clearOutputText() {
+      this.outputText = ''
     },
     importText() {
       const { dialog } = require('@electron/remote')
-      console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
+      const fs = require('fs')
+      const path = require('path')
+      dialog.showOpenDialog({
+        title: '选择导入文件',
+        buttonLabel: '导入',
+        filters: [{ name: 'Plain text files', extensions: ['txt'] }],
+        properties: [
+          'openFile',
+          'showHiddenFiles'
+        ]
+      }).then(e => {
+        if (e.canceled === false) {
+          fs.readFile(
+              path.resolve(e.filePaths[0]),
+              'utf-8',
+              (err, data) => {
+                if (err) this.reportError(err.message);
+                this.inputText = data.toString();
+              }
+          )
+        }
+      })
     },
     exportText() {
 
