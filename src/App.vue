@@ -46,11 +46,17 @@
             <div class="pt-3" style="height: 60%">
               <v-card class="elevation-6" style="height: 100%; display: flex; flex-direction: column">
                 <v-toolbar class="elevation-0 py-1" style="flex-grow: 0">
-                  <v-btn dark class="primary"> 导入文本文件 <v-icon right light> mdi-file-import </v-icon> </v-btn>
+                  <v-btn dark class="primary" @click="importText"> 导入文本文件 <v-icon right light> mdi-file-import </v-icon> </v-btn>
                   <v-spacer/>
                   <v-btn dark class="primary" @click="clearText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
                   <v-spacer/>
-                  <v-btn dark class="primary"> 求解 <v-icon right light> mdi-send </v-icon> </v-btn>
+                  <v-btn dark class="primary"
+                         @click="solve"
+                         :loading="calculating"
+                         :disabled="calculating">
+                    求解
+                    <v-icon right light> mdi-send </v-icon>
+                  </v-btn>
                 </v-toolbar>
                 <v-card-text style="flex-grow: 1" class="pt-3">
                   <v-textarea filled no-resize height="86%" placeholder="在此处输入单词文本" style="height: 100%" v-model="inputText"/>
@@ -61,7 +67,7 @@
           <v-col cols="6" style="height: 100%" class="pr-6">
             <v-card class="elevation-6" style="height: 100%; display: flex; flex-direction: column">
               <v-toolbar class="elevation-0 py-1" style="flex-grow: 0">
-                <v-btn dark class="primary"> 导出文本文件 <v-icon right light> mdi-file-export </v-icon> </v-btn>
+                <v-btn dark class="primary" @click="exportText"> 导出文本文件 <v-icon right light> mdi-file-export </v-icon> </v-btn>
               </v-toolbar>
               <v-card-text style="flex-grow: 1" class="pt-3">
                 <v-textarea filled no-resize height="93%" placeholder="求解结果" style="height: 100%" readonly v-model="outputText"/>
@@ -85,6 +91,7 @@ export default {
     allowRing: false,
     inputText: '',
     outputText: '',
+    calculating: false,
     rules: {
       singleLetter: v => !v || /^[a-zA-Z]$/.test(v) || '只能指定单个英文字母',
     }
@@ -97,7 +104,21 @@ export default {
   methods: {
     clearText() {
       this.inputText = ''
-    }
+    },
+    importText() {
+      const { dialog } = require('electron').remote
+      console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
+    },
+    exportText() {
+
+    },
+    solve() {
+      this.calculating = true;
+      (async function (vm) {
+        const _ = require('lodash');
+        vm.outputText = _.shuffle(vm.inputText.split('')).join('');
+      }) (this).then(() => this.calculating = false)
+    },
   }
 };
 </script>

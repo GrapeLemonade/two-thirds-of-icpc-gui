@@ -4,8 +4,15 @@ module.exports = defineConfig({
   transpileDependencies: [
     'vuetify'
   ],
+  configureWebpack: {
+    externals: {
+      fs: 'require("fs")',
+      path: 'require("path")'
+    }
+  },
   pluginOptions: {
     electronBuilder: {
+      nodeIntegration: true,
       builderOptions: {
         "win": {
           "target": [
