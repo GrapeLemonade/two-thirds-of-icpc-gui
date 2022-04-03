@@ -83,6 +83,11 @@
 </template>
 
 <script>
+const path = require('path')
+const ffi = require('ffi-napi')
+const corePtr = ffi.DynamicLibrary(path.resolve('./core.dll')).get('gui_engine')
+const core = ffi.ForeignFunction(corePtr, 'string', ['string', 'int', 'char', 'char', 'bool'])
+
 export default {
   name: 'App',
   data: () => ({
@@ -167,8 +172,18 @@ export default {
     solve() {
       this.calculating = true;
       (async function (vm) {
-        const _ = require('lodash');
-        vm.outputText = _.shuffle(vm.inputText.split('')).join('');
+        let text = core(
+            vm.inputText,
+            [0, vm.allowRing ? 3 : 1, 2, vm.allowRing ? 3 : 1][vm.selectedMode],
+            vm.noAvailableOptions || !vm.head ? 0 : vm.head.charCodeAt(0),
+            vm.noAvailableOptions || !vm.tail ? 0 : vm.tail.charCodeAt(0),
+            vm.selectedMode === 3
+        )
+        if (/^WordList-GUI: /.test(text)) {
+          vm.reportError(text.substring(14))
+        } else {
+          vm.outputText = text
+        }
       }) (this).then(() => this.calculating = false)
     },
   }

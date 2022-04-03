@@ -7,7 +7,8 @@ module.exports = defineConfig({
   configureWebpack: {
     externals: {
       fs: 'require("fs")',
-      path: 'require("path")'
+      path: 'require("path")',
+      'ffi-napi': 'require("ffi-napi")'
     }
   },
   pluginOptions: {
