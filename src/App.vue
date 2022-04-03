@@ -120,7 +120,7 @@ export default {
       dialog.showOpenDialog({
         title: '选择导入文件',
         buttonLabel: '导入',
-        filters: [{ name: 'Plain text files', extensions: ['txt'] }],
+        filters: [{ name: '文本文件', extensions: ['txt'] }],
         properties: [
           'openFile',
           'showHiddenFiles'
@@ -139,7 +139,30 @@ export default {
       })
     },
     exportText() {
-
+      const { dialog } = require('@electron/remote')
+      const fs = require('fs')
+      const path = require('path')
+      dialog.showOpenDialog({
+        title: '指定导出文件',
+        buttonLabel: '保存',
+        filters: [{ name: '文本文件', extensions: ['txt'] }],
+        properties: [
+          'openFile',
+          'showHiddenFiles',
+          'promptToCreate'
+        ]
+      }).then(e => {
+        if (e.canceled === false) {
+          fs.writeFile(
+              path.resolve(e.filePaths[0]),
+              this.outputText,
+              'utf-8',
+              (err) => {
+                if (err) this.reportError(err.message)
+              }
+          )
+        }
+      })
     },
     solve() {
       this.calculating = true;
