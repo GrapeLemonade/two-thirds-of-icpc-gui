@@ -9,7 +9,7 @@
                 <v-container fluid class="fill-height py-0">
                   <v-row class="align-center justify-center" style="height: 100%">
                     <v-col class="pa-0" cols="4" style="height: 100%">
-                      <v-list dark class="rounded-l pa-0 green" style="height: 100%">
+                      <v-list dark class="rounded-l pa-0 primary" style="height: 100%">
                         <v-list-item-group mandatory active-class="indicator" v-model="selectedMode" style="height: 100%">
                           <v-list-item
                               v-for="(item, i) in modes"
@@ -25,25 +25,46 @@
                         </v-list-item-group>
                       </v-list>
                     </v-col>
-                    <v-col cols="8">
-
+                    <v-col cols="8" style="height: 100%; display: flex" class="justify-center">
+                      <v-card-title v-if="noAvailableOptions" class="justify-center text--secondary">
+                        无可用选项
+                      </v-card-title>
+                      <v-col v-if="!noAvailableOptions" style="height: 100%" class="mode-options py-0 px-2">
+                        <v-text-field label="首字母限制"
+                                      v-model="head"
+                                      :rules="[rules.singleLetter]"/>
+                        <v-text-field label="尾字母限制" class="my-3"
+                                      v-model="tail"
+                                      :rules="[rules.singleLetter]"/>
+                        <v-checkbox label="允许单词环" class="mt-6" v-model="allowRing"></v-checkbox>
+                      </v-col>
                     </v-col>
                   </v-row>
                 </v-container>
               </v-card>
             </div>
             <div class="pt-3" style="height: 60%">
-              <v-card class="elevation-6" style="height: 100%">
-                <v-card-text>
-                  debug
+              <v-card class="elevation-6" style="height: 100%; display: flex; flex-direction: column">
+                <v-toolbar class="elevation-0 py-1" style="flex-grow: 0">
+                  <v-btn dark class="primary"> 导入文本文件 <v-icon right light> mdi-file-import </v-icon> </v-btn>
+                  <v-spacer/>
+                  <v-btn dark class="primary" @click="clearText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
+                  <v-spacer/>
+                  <v-btn dark class="primary"> 求解 <v-icon right light> mdi-send </v-icon> </v-btn>
+                </v-toolbar>
+                <v-card-text style="flex-grow: 1" class="pt-3">
+                  <v-textarea filled no-resize height="86%" placeholder="在此处输入单词文本" style="height: 100%" v-model="inputText"/>
                 </v-card-text>
               </v-card>
             </div>
           </v-col>
           <v-col cols="6" style="height: 100%" class="pr-6">
-            <v-card class="elevation-6" style="height: 100%">
-              <v-card-text>
-                debug
+            <v-card class="elevation-6" style="height: 100%; display: flex; flex-direction: column">
+              <v-toolbar class="elevation-0 py-1" style="flex-grow: 0">
+                <v-btn dark class="primary"> 导出文本文件 <v-icon right light> mdi-file-export </v-icon> </v-btn>
+              </v-toolbar>
+              <v-card-text style="flex-grow: 1" class="pt-3">
+                <v-textarea filled no-resize height="93%" placeholder="求解结果" style="height: 100%" readonly v-model="outputText"/>
               </v-card-text>
             </v-card>
           </v-col>
@@ -58,12 +79,44 @@ export default {
   name: 'App',
   data: () => ({
     modes: ['单词链数量', '单词数最多', '首字母不同', '字母数最多'],
-    selectedMode: 0,
+    selectedMode: 1,
+    head: '',
+    tail: '',
+    allowRing: false,
+    inputText: '',
+    outputText: '',
+    rules: {
+      singleLetter: v => !v || /^[a-zA-Z]$/.test(v) || '只能指定单个英文字母',
+    }
   }),
+  computed: {
+    noAvailableOptions: function () {
+      return this.selectedMode === 0 || this.selectedMode === 2
+    }
+  },
+  methods: {
+    clearText() {
+      this.inputText = ''
+    }
+  }
 };
 </script>
 
 <style lang="css">
+.v-textarea > * {
+  height: 100% !important;
+}
+/*textarea {
+  -ms-overflow-style: none;
+}
+textarea::-webkit-scrollbar {
+  display: none;
+}*/
+.mode-options {
+  display: grid !important;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  margin: 0 !important;
+}
 html {
   overflow: hidden !important;
 }
