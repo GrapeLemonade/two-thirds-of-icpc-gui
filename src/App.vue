@@ -106,7 +106,7 @@ export default {
       this.inputText = ''
     },
     importText() {
-      const { dialog } = require('electron').remote
+      const { dialog } = require('@electron/remote')
       console.log(dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }))
     },
     exportText() {
