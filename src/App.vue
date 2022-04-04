@@ -92,7 +92,7 @@
                 <v-btn dark class="primary" @click="clearOutputText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
               </v-toolbar>
               <v-card-text style="flex-grow: 1" class="pt-3">
-                <v-textarea filled no-resize height="93%" placeholder="求解结果" style="height: 100%" readonly v-model="outputText"/>
+                <v-textarea filled no-resize height="93%" placeholder="求解结果" style="height: 100%" readonly v-model="outputText" :success-messages="runMessage"/>
               </v-card-text>
             </v-card>
           </v-col>
@@ -107,6 +107,7 @@ const path = window.require('path')
 const ffi = window.require('ffi-napi')
 const corePtr = ffi.DynamicLibrary(path.resolve('./core.dll')).get('gui_engine')
 const core = ffi.ForeignFunction(corePtr, 'string', ['string', 'int', 'char', 'char', 'bool'])
+const moment = window.require('moment')
 
 export default {
   name: 'App',
@@ -125,6 +126,7 @@ export default {
     snackbar: false,
     timeout: 3000,
     reportText: '',
+    runMessage: ''
   }),
   computed: {
     noAvailableOptions: function () {
@@ -196,6 +198,8 @@ export default {
     solve() {
       this.calculating = true
       this.outputText = ''
+      this.runMessage = ''
+      let start = moment()
       core.async(
           this.inputText,
           [0, this.allowRing ? 3 : 1, 2, this.allowRing ? 3 : 1][this.selectedMode],
@@ -208,6 +212,7 @@ export default {
               this.reportError(d.substring(14))
             } else {
               this.outputText = d
+              this.runMessage = '计算用时：' + moment().diff(start) + 'ms'
             }
             this.calculating = false
           }
