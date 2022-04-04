@@ -1,6 +1,25 @@
 <template>
   <v-app>
     <v-main id="main">
+      <v-snackbar
+          dark
+          color="orange"
+          v-model="snackbar"
+          :timeout="timeout"
+      >
+        {{ reportText }}
+        <template v-slot:action="{ attrs }">
+          <v-btn
+              text
+              v-bind="attrs"
+              @click="snackbar = false"
+          >
+            <v-icon>
+              mdi-close
+            </v-icon>
+          </v-btn>
+        </template>
+      </v-snackbar>
       <v-container fluid class="fill-height">
         <v-row class="align-center justify-center" style="height: 100%">
           <v-col cols="6" style="height: 100%" class="pl-6">
@@ -50,9 +69,10 @@
                   <v-spacer/>
                   <v-btn dark class="primary" @click="clearInputText"> 清空 <v-icon right light> mdi-cached </v-icon> </v-btn>
                   <v-spacer/>
-                  <v-btn dark class="primary"
+                  <v-btn class="primary"
                          @click="solve"
                          :loading="calculating"
+                         :dark="!calculating"
                          :disabled="calculating">
                     求解
                     <v-icon right light> mdi-send </v-icon>
@@ -101,7 +121,10 @@ export default {
     calculating: false,
     rules: {
       singleLetter: v => !v || /^[a-zA-Z]$/.test(v) || '只能指定单个英文字母',
-    }
+    },
+    snackbar: false,
+    timeout: 3000,
+    reportText: '',
   }),
   computed: {
     noAvailableOptions: function () {
@@ -110,7 +133,8 @@ export default {
   },
   methods: {
     reportError(msg) {
-      alert(msg)
+      this.reportText = msg
+      this.snackbar = true
     },
     clearInputText() {
       this.inputText = ''
@@ -170,21 +194,24 @@ export default {
       })
     },
     solve() {
-      this.calculating = true;
-      (async function (vm) {
-        let text = core(
-            vm.inputText,
-            [0, vm.allowRing ? 3 : 1, 2, vm.allowRing ? 3 : 1][vm.selectedMode],
-            vm.noAvailableOptions || !vm.head ? 0 : vm.head.charCodeAt(0),
-            vm.noAvailableOptions || !vm.tail ? 0 : vm.tail.charCodeAt(0),
-            vm.selectedMode === 3
-        )
-        if (/^WordList-GUI: /.test(text)) {
-          vm.reportError(text.substring(14))
-        } else {
-          vm.outputText = text
-        }
-      }) (this).then(() => this.calculating = false)
+      this.calculating = true
+      this.outputText = ''
+      core.async(
+          this.inputText,
+          [0, this.allowRing ? 3 : 1, 2, this.allowRing ? 3 : 1][this.selectedMode],
+          this.noAvailableOptions || !this.head ? 0 : this.head.charCodeAt(0),
+          this.noAvailableOptions || !this.tail ? 0 : this.tail.charCodeAt(0),
+          this.selectedMode === 3,
+          (e, d) => {
+            if (e) this.reportError(e)
+            if (/^WordList-GUI: /.test(d)) {
+              this.reportError(d.substring(14))
+            } else {
+              this.outputText = d
+            }
+            this.calculating = false
+          }
+      )
     },
   }
 };
