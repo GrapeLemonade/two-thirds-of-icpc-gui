@@ -83,8 +83,8 @@
 </template>
 
 <script>
-const path = require('path')
-const ffi = require('ffi-napi')
+const path = window.require('path')
+const ffi = window.require('ffi-napi')
 const corePtr = ffi.DynamicLibrary(path.resolve('./core.dll')).get('gui_engine')
 const core = ffi.ForeignFunction(corePtr, 'string', ['string', 'int', 'char', 'char', 'bool'])
 

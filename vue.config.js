@@ -8,17 +8,18 @@ module.exports = defineConfig({
     externals: {
       fs: 'require("fs")',
       path: 'require("path")',
-      'ffi-napi': 'require("ffi-napi")'
+      'ffi-napi': 'commonjs ffi-napi',
     }
   },
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
+      externals: ['ffi-napi'],
       builderOptions: {
         "win": {
           "target": [
               "nsis",
-              "portable"
+              // "portable"
           ]
         }
       }
