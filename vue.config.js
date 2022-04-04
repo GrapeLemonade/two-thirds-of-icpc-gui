@@ -19,9 +19,15 @@ module.exports = defineConfig({
         "win": {
           "target": [
               "nsis",
-              // "portable"
+              "portable"
           ]
-        }
+        },
+        extraFiles: [
+          {
+            from: './core.dll',
+            to: 'core.dll'
+          }
+        ]
       }
     }
   }
