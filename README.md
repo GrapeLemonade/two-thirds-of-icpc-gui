@@ -1,24 +1,31 @@
 # two-thirds-of-icpc-gui
 
-## Project setup
+## 结对编程项目：单词链求解器（GUI 子模块）
+
+形式上看，结对编程无非就是 2/3 ICPC，因此得名。
+
+- 基本功能
+    - 从文件导入单词文本
+    - 直接编辑单词文本
+    - 四种求解模式、三种可选选项（部分模式可用）
+    - 导出方案至文件
+- 额外特性
+    - 异步计算，计算过程中 UI 正常响应
+    - 显示计算所用时间
+
+## 手动构建
+
+### 安装
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 测试
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+npm run electron:serve
 ```
 
-### Lints and fixes files
+### 生成应用包
 ```
-npm run lint
+npm run electron:build
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
